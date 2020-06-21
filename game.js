@@ -4,8 +4,8 @@ window.onload = carregaJogo;
 var casasPermitidas = [18, 20, 23, 25, 27, 28, 34, 37, 39, 43, 44, 45, 46, 47, 50, 51, 54, 57, 58, 59, 60, 61, 62, 63, 68, 71, 73, 75, 76, 77, 78, 79, 83, 86, 89, 90, 91, 92, 93, 95, 98, 101, 105, 106, 107, 108, 109, 110, 111, 115, 118, 119, 121, 122, 123, 124, 125, 130, 132, 135, 140, 141, 143, 146, 149, 151];
 var casasDaMS = [35, 36, 41, 42, 52, 53, 55, 66, 67, 69, 70, 74, 82, 84, 85, 87, 94, 99, 100, 102, 103, 114, 116, 117, 126, 127, 131, 133, 134, 142];
 //let numCasas = [];
-let startPosition = [27, 60, 77, 79, 89, 91, 108, 141];
-let idc3 = [5, 1, 4, 2, 6, 8, 3, 7];
+let startPosition = [27, 60, 77, 79, 89, 91, 108, 141];//<-
+let idc3 = [5, 1, 4, 2, 6, 8, 3, 7];//<-
 let startCandeeiro = [42, 55, 69, 100, 114, 126];
 let ordemCande = [4, 1, 5, 6, 2, 3];
 var tuneisEsgoto = [20, 39, 57, 68, 95, 101, 122, 149];
@@ -208,7 +208,7 @@ function carregaRonda() {
       plChar.setAttribute("onclick", "escolha" + sChar + "j(this)");
       document.getElementsByClassName("cartas2")[0].appendChild(plChar);
     }
-    console.log("falta", cartasJogoShuf);
+    //console.log("falta", cartasJogoShuf);
   }
 }
 /** o criaResto cria:
@@ -329,7 +329,7 @@ function escolha5j(card) {
   var cardID = card.id;
   var cartaoPersona = cardID.substring(4);
   document.getElementById("drag" + cartaoPersona).setAttribute("draggable", "true");
-  document.getElementById("drag" + cartaoPersona).setAttribute("ondragstart", "drag(event, this)");
+  document.getElementById("drag" + cartaoPersona).setAttribute("ondragstart", "dragMS(event, this)");
   document.getElementById(card.id).style.opacity = "0.7";
   document.getElementById(card.id).removeAttribute("onclick");
   missStelEsp();
@@ -341,7 +341,7 @@ function escolha6j(card) {
   var cardID = card.id;
   var cartaoPersona = cardID.substring(4);
   document.getElementById("drag" + cartaoPersona).setAttribute("draggable", "true");
-  //document.getElementById("drag" + cartaoPersona).setAttribute("ondragstart", "drag(event, this)");
+  document.getElementById("drag" + cartaoPersona).setAttribute("ondragstart", "drag(event, this)");
   document.getElementById(card.id).style.opacity = "0.7";
   document.getElementById(card.id).removeAttribute("onclick");
 
@@ -385,7 +385,6 @@ function escolha8j(card) {
     esgt[i].setAttribute("ondragstart", "drag(event, this)");
 
   }
-
   dropEsgt();
 }
 
@@ -437,32 +436,41 @@ function terminaMov(este) {
     }
   
     /** adicionar o apagar candeeiros */
-    if (apagaCande === 4) {
-      document.getElementById("candeeiro1").hidden = true;
-      document.getElementById("relogio").setAttribute("src", "./assets/torre7.png");
-    } else if (apagaCande === 8) {
+    switch(apagaCande) {
+      case apagaCande === 4:        
+        document.getElementById("candeeiro1").hidden = true;
+        document.getElementById("relogio").setAttribute("src", "./assets/torre7.png");
+        break;
+    case apagaCande === 8:
       document.getElementById("candeeiro2").hidden = true;
       document.getElementById("relogio").setAttribute("src", "./assets/torre6.png");
       question();
-    } else if (apagaCande === 12) {
+      break;
+    case apagaCande === 12:
       document.getElementById("candeeiro3").hidden = true;
       document.getElementById("relogio").setAttribute("src", "./assets/torre5.png");
       question();
-    } else if (apagaCande === 16) {
+      break;
+    case apagaCande === 16:
       document.getElementById("candeeiro4").hidden = true;
       document.getElementById("relogio").setAttribute("src", "./assets/torre4.png");
       question();
-    } else if (apagaCande === 20) {
+      break;
+    case apagaCande === 20:
       document.getElementById("relogio").setAttribute("src", "./assets/torre3.png");
       question();
-    } else if (apagaCande === 24) {
+      break;
+    case apagaCande === 24:
       document.getElementById("relogio").setAttribute("src", "./assets/torre2.png");
       question();
-    } else if (apagaCande === 28) {
+      break;
+    case apagaCande === 28:
       document.getElementById("relogio").setAttribute("src", "./assets/torre1.png");
       question();
-    } else if (apagaCande === 32) {
+      break;
+    case apagaCande === 32:
       endGameJackWIN();
+      break;
     }
   
 }
@@ -589,14 +597,14 @@ function drag(ev, cenas) {
   ev.dataTransfer.setData("text", ev.target.id);
   let estaDiv = parseInt(ev.path[1].id);
   let perMovi = ev.path[0].id;
-  console.log("drag", estaDiv, ev.target, perMovi);
+  //console.log("drag", "estadiv", estaDiv, "ev.target", ev.target, "perMovi", perMovi, "ev.path", ev.path, "consola_do_drag");
 
   //var candee = ["candeeiro1", "candeeiro2", "candeeiro3", "candeeiro4", "candeeiro5", "candeeiro6"];
   var naoJogador = ["drag1", "drag2", "drag3", "drag4", "drag5", "drag6", "drag7","drag8"];
 
   if (naoJogador.includes(perMovi)){
   adicionaDrop(estaDiv);
-  } else if(perMovi === "esgoto39" || perMovi === "esgoto39") {
+  } else if(perMovi === "esgoto39" || perMovi === "esgoto122") {
     dropEsgt();
   } else if (perMovi ==="barreira23"|| perMovi ==="barreira146") {
     dropBarrie();
@@ -609,7 +617,7 @@ function drag(ev, cenas) {
 function allowDrop(ev, dedo) {
   ev.preventDefault();
   let x = document.getElementsByClassName('casa').id;
-  console.log("isto e a div", x);
+  //console.log("isto e a div", x);
 }
 
 /** adiciona a função de drop ao jogo
@@ -618,6 +626,24 @@ function allowDrop(ev, dedo) {
  * de acordo com a personagem usada diferentes efeitos surgem
  * função de cada personagem depois desta
  */
+function dropMs(ev, nariz) {
+  ev.preventDefault();
+  var data = ev.dataTransfer.getData("text");
+  nariz.appendChild(document.getElementById(data));
+
+  let x = document.getElementById(nariz.id).children[0];
+  let sinal = x.id;
+
+  if (sinal === "drag5" && moves > 3) {
+    removeMsSpec();
+    terminaMov();
+    this.moves = 0;
+    this.specMove = false;
+    this.allMove = false;
+  }
+}
+
+
 function drop(ev, nariz) {
   ev.preventDefault();
   var data = ev.dataTransfer.getData("text");
@@ -631,7 +657,8 @@ function drop(ev, nariz) {
   /** movimento especial/ drag and drop */
   if (outrosItems.includes(sinal) && specMove === false) {
     this.specMove = true;
-    limpaSpMo();
+    limpaSpMo()
+    document.getElementById("botFim").style.display === "block";
   } else {
     this.moves++;
   }
@@ -647,15 +674,6 @@ function drop(ev, nariz) {
   if (sinal === "drag2" && moves > 2) {
     mudaDirect();
     this.specMove = true;
-  }
-
-
-  if (sinal === "drag5" && moves > 3) {
-    removeMsSpec();
-    terminaMov();
-    this.moves = 0;
-    this.specMove = false;
-    this.allMove = false;
   }
 
   if (this.bloqueioDeSeguranca === false && sinal !== "drag6") {
@@ -749,14 +767,27 @@ function sacaTestemunha(chrsShuf) {
 
 /** funções que permitem o drop dos esgotos, candeeiros e barreiras 
  * ao fazer o drag as funções são activadas consoante as necessidades
+ * esta função permite fazer drop das tampas de esgoto
+ * tem de actualizar o array ds casas de esgoto
 */
 function dropEsgt() {
   var casaEsgoto = [20, 39, 57, 68, 95, 101, 122, 149];
-  for (i = 0; i < casaEsgoto.length; i++) {
-    let a = document.getElementById(casaEsgoto[i]);
-    a.setAttribute("ondrop", "drop(event, this)");
+  for (i = 0; i < esgotosAbertos.length; i++) {
+    let a = document.getElementById(esgotosAbertos[i]);
+    a.setAttribute("ondrop", "dropActuEsgo(event, this)");
     a.setAttribute("ondragover", "allowDrop(event, this)");
   }
+}
+
+function dropActuEsgo(){/** 
+  for(i=0; i<tuneisEsgoto.length; i++){
+    var prov = document.getElementById(tuneisEsgoto[i]);
+    if( prov.innerHTML === ""){
+      var esgotosActualizados = [];
+      esgotosActualizados.push(prov);
+    }
+  }
+  console.log("os esgotos livres são", esgotosActualizados);*/
 }
 function dropCand() {
   var casaCandeeiro = [36, 42, 55, 69, 100, 114, 126, 133];

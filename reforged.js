@@ -1,0 +1,562 @@
+/** Mr jack reforged 
+Passo 1 -> criar o jogo -> feito
+passo 2 -> movimentar as personagens 
+passo 3 -> movimentos especiais
+passo 4 -> fim do turno -> feito
+passo 5 -> fim do jogo
+**/
+window.onload = carregaJogo;
+//variaveis
+var autorizedHoles = [18, 20, 23, 25, 27, 28, 34, 37, 39, 43, 44, 45, 46, 47, 50, 51, 54, 57, 58, 59, 60, 61, 62, 63, 68, 71, 73, 75, 76, 77, 78, 79, 83, 86, 89, 90, 91, 92, 93, 95, 98, 101, 105, 106, 107, 108, 109, 110, 111, 115, 118, 119, 121, 122, 123, 124, 125, 130, 132, 135, 140, 141, 143, 146, 149, 151];
+var startPawnPosition = [27, 60, 77, 79, 89, 91, 108, 141];
+var ordemEntradaPawn = [5, 1, 4, 2, 6, 8, 3, 7];
+var startCandeeiro = [42, 55, 69, 100, 114, 126];
+var orderCande = [4, 1, 5, 6, 2, 3];
+
+var startTampaEsgoto = [39, 122];
+
+var startBarreiras = [23, 146];
+
+var whoIsJack;
+var chrsShufle;
+
+var rotacao = 60;
+var moves = 0;
+var specialMoveUsed = false;
+var allMovesSpend = false;
+var apagaCandeiro = 0;
+var player1 = true;
+var player2 = false;
+var bloqueioDeSeguranca = true;
+
+/** passo 1*/
+/** passo 1.1 criar tabuleiro */
+function carregaJogo() {
+    //criar tauleiro de jogo, iniciando nas casas
+    for (var i = 1; i < 169; i++) {
+        let casasTabuleiro = document.createElement("DIV");
+        casasTabuleiro.setAttribute("class", "casa");
+        casasTabuleiro.setAttribute("id", i);
+        document.getElementById("tabuleiro").appendChild(casasTabuleiro);
+        // de seguida os peões
+        var f = i;
+        if (startPawnPosition.includes(f)) {
+            let populate = ordemEntradaPawn.pop();
+            let player = document.createElement("IMG");
+            player.setAttribute("class", "plr");
+            player.setAttribute("id", "drag" + populate);
+            player.setAttribute("src", "./assets/" + populate + ".png");
+            player.setAttribute("width", "35");
+            player.setAttribute("height", "35");
+            player.setAttribute("z-index", "10");
+            document.getElementById(f).appendChild(player);
+            startPawnPosition.shift();
+        };
+        //candeeiros
+        if (startCandeeiro.includes(f)) {
+            let candou = orderCande.pop();
+            let lighter = document.createElement("IMG");
+            lighter.setAttribute("class", "cande");
+            lighter.setAttribute("id", "cande" + candou);
+            lighter.setAttribute("src", "./assets/cande" + candou + ".png");
+            lighter.setAttribute("width", "49");
+            lighter.setAttribute("height", "49");
+            lighter.setAttribute("z-index", "-1");
+            document.getElementById(f).appendChild(lighter);
+        };
+        //esgotos
+        if (startTampaEsgoto.includes(f)) {
+            let esgoto = document.createElement("IMG");
+            esgoto.setAttribute("class", "esgoto");
+            esgoto.setAttribute("id", "esgoto" + f);
+            esgoto.setAttribute("src", "./assets/esgoto.png");
+            esgoto.setAttribute("width", "49");
+            esgoto.setAttribute("height", "49");
+            esgoto.setAttribute("z-index", "-1");
+            document.getElementById(f).appendChild(esgoto);
+        };
+        //barreiras
+        if (startBarreiras.includes(f)) {
+            let barreira = document.createElement("IMG");
+            barreira.setAttribute("class", "barreira");
+            barreira.setAttribute("id", "barreira" + f);
+            barreira.setAttribute("src", "./assets/barr.png");
+            barreira.setAttribute("width", "49");
+            barreira.setAttribute("height", "49");
+            barreira.setAttribute("padding", "none");
+            barreira.setAttribute("margin", "none");
+            barreira.setAttribute("z-index", "-1");
+            document.getElementById(f).appendChild(barreira);
+        };
+    }
+    var posDivX = document.getElementById("89").offsetTop;
+    var posDivY = document.getElementById("89").offsetLeft;
+    var lant = document.getElementById("setaimg");
+    lant.style.left = (posDivY + 15) + "px";
+    lant.style.top = (posDivX - 25) + "px";
+};
+/** passo 1.5 funções de inicio de jogo */
+function iniciaJogo() {
+    var chrs = [1, 2, 3, 4, 5, 6, 7, 8];
+    chrsShufle = chrs.sort(function (a, b) { return 0.5 - Math.random() });
+    whoIsJack = chrsShufle.pop();
+    var i = document.getElementsByClassName("inicia");
+    if (i[0].style.display === "none") {
+        i[0].style.display = "block";
+    } else {
+        i[0].style.display = "none";
+    }
+    /** acima faz o sort da carta do Jack abaixo o botão */
+    /**criado o botão que oculta a carta do jack */
+    let buttonJack = document.createElement("BUTTON");
+    let textoN = document.createTextNode("Show/hide Jack");
+
+    buttonJack.setAttribute("class", "hideJack");
+    buttonJack.setAttribute("onclick", "olhoJack()");
+    buttonJack.appendChild(textoN);
+
+    document.getElementsByClassName("info")[0].appendChild(buttonJack);
+    document.getElementById("crts").style.backgroundColor = "#e6e6e6";
+
+    /** a imagem com a identidade do jack
+     * a mesma alterada pelo botão. tem de começar hidden*/
+    let jack = document.createElement("IMG");
+    jack.setAttribute("class", "jack");
+    jack.setAttribute("id", "jack" + whoIsJack);
+    jack.setAttribute("src", "./assets/Scan0" + whoIsJack + ".png");
+    jack.style.display = "none";
+    document.getElementsByClassName("info")[0].appendChild(jack);
+
+    let jackIsVisible = document.createElement("IMG");
+    jackIsVisible.setAttribute("class", "visornot");
+    jackIsVisible.setAttribute("id", "visornot");
+
+    var sp0 = buttonJack;
+    var sp2 = jack;
+    var sp3 = jackIsVisible;
+    var sp1 = document.getElementsByClassName("cards")[0];
+    var divCartas = sp1.parentNode;
+    divCartas.insertBefore(sp0, sp1);
+    divCartas.insertBefore(sp2, sp1);
+    divCartas.insertBefore(sp3, sp1);
+    /** o sp2, vem antes do sp1, e o sp0 vem antes do sp1 */
+
+    carregaRonda();
+    makeRest();
+
+    return chrsShufle;
+};
+
+function carregaRonda() {
+    var gameCards = [1, 2, 3, 4, 5, 6, 7, 8];
+    var shuffleGameCards = gameCards.sort(function (a, b) { return 0.5 - Math.random() });
+
+    let part1 = document.createElement("DIV");
+    part1.setAttribute("class", "cards1");
+    part1.setAttribute("id", "cards1");
+    document.getElementsByClassName("cards")[0].appendChild(part1);
+
+    let part2 = document.createElement("DIV");
+    part2.setAttribute("class", "cards2");
+    part2.setAttribute("id", "cards2");
+    document.getElementsByClassName("cards")[0].appendChild(part2);
+    //document.getElementById("cards2").hidden = true;
+
+    for (i = 0; i < 8; i++) {
+        if (i < 4) {
+            let sChar = shuffleGameCards.pop();
+            let plChar = document.createElement("IMG");
+            plChar.setAttribute("class", "plChar");
+            plChar.setAttribute("id", "char" + sChar);
+            plChar.setAttribute("src", "./assets/Perso0" + sChar + ".png");
+            plChar.setAttribute("onclick", "escolha" + sChar + "j(this)");
+            document.getElementsByClassName("cards1")[0].appendChild(plChar);
+        } else {
+            let sChar = shuffleGameCards.pop();
+            let plChar = document.createElement("IMG");
+            plChar.setAttribute("class", "plChar");
+            plChar.setAttribute("id", "char" + sChar);
+            plChar.setAttribute("src", "./assets/Perso0" + sChar + ".png");
+            plChar.setAttribute("onclick", "escolha" + sChar + "j(this)");
+            document.getElementsByClassName("cards2")[0].appendChild(plChar);
+        }
+    }
+}
+
+function makeRest() {
+    let watch = document.createElement("IMG");
+    watch.setAttribute("class", "relogio");
+    watch.setAttribute("id", "relogio");
+    watch.setAttribute("src", "./assets/torre8.png");
+    watch.setAttribute("height", "150px");
+    document.getElementById("restoDasCoisas").appendChild(watch);
+
+    let testemony = document.createElement("IMG");
+    testemony.setAttribute("class", "restoTestemunha");
+    testemony.setAttribute("Id", "restoTestemunha");
+    testemony.setAttribute("src", "./assets/bgCard1.png");
+    testemony.setAttribute("height", "150px");
+    document.getElementById("restoDasCoisas").appendChild(testemony);
+
+    let nextCards = document.createElement("IMG");
+    nextCards.setAttribute("class", "restoCartas");
+    nextCards.setAttribute("id", "restoCartas");
+    nextCards.setAttribute("src", "./assets/bgCard2.png");
+    nextCards.setAttribute("height", "150px");
+    document.getElementById("restoDasCoisas").appendChild(nextCards);
+}
+
+function olhoJack() {
+    var i = document.getElementsByClassName("jack");
+    if (i[0].style.display === "none") {
+        i[0].style.display = "block";
+    } else {
+        i[0].style.display = "none";
+    }
+};
+
+function escolha1j(cards) {
+    removePawnOnClick();
+    document.getElementById("drag1").setAttribute("draggable", "true");
+    document.getElementById("drag1").setAttribute("ondragstart", "drag(event, this)");
+    document.getElementById("char1").style.opacity = "0.7";
+    document.getElementById("char1").removeAttribute("onclick");
+    document.getElementById("restoTestemunha").setAttribute("onclick", "recolheTestemunha()");
+}
+function escolha2j(cards) {
+    removePawnOnClick();
+    document.getElementById("drag2").setAttribute("draggable", "true");
+    document.getElementById("drag2").setAttribute("ondragstart", "drag(event, this)");
+    document.getElementById("char2").style.opacity = "0.7";
+    document.getElementById("char2").removeAttribute("onclick");
+}
+function escolha3j(cards) {
+    removePawnOnClick();
+    document.getElementById("drag3").setAttribute("draggable", "true");
+    document.getElementById("drag3").setAttribute("ondragstart", "drag(event, this)");
+    document.getElementById("char3").style.opacity = "0.7";
+    document.getElementById("char3").removeAttribute("onclick");
+
+    let allLighters = document.getElementsByClassName("cande");
+    for (let i = 0; i < allLighters.length; i++) {
+        allLighters[i].setAttribute("draggable", "true");
+        allLighters[i].setAttribute("ondragstart", "drag(event, this)");
+    }
+}
+function escolha4j(cards) {
+    removePawnOnClick();
+    document.getElementById("drag4").setAttribute("draggable", "true");
+    document.getElementById("drag4").setAttribute("ondragstart", "drag(event, this)");
+    document.getElementById("char4").style.opacity = "0.7";
+    document.getElementById("char4").removeAttribute("onclick");
+    let allBlockates = document.getElementsByClassName("barreira");
+    for (let i = 0; i < allBlockates.length; i++) {
+        allBlockates[i].setAttribute("draggable", "true");
+        allBlockates[i].setAttribute("ondragstart", "drag(event, this)");
+    }
+}
+function escolha5j(cards) {
+    removePawnOnClick();
+    document.getElementById("drag5").setAttribute("draggable", "true");
+    document.getElementById("drag5").setAttribute("ondragstart", "drag(event, this)");
+    document.getElementById("char5").style.opacity = "0.7";
+    document.getElementById("char5").removeAttribute("onclick");
+}
+function escolha6j(cards) {
+    removePawnOnClick();
+    let allChars = document.getElementsByClassName("plr");
+    for (let i = 0; i < allChars.length; i++) {
+        allChars[i].setAttribute("draggable", "true");
+        allChars[i].setAttribute("ondragstart", "dragothers(event, this)");
+    }
+    document.getElementById("drag6").setAttribute("draggable", "true");
+    document.getElementById("drag6").setAttribute("ondragstart", "drag(event, this)");
+    document.getElementById("char6").style.opacity = "0.7";
+    document.getElementById("char6").removeAttribute("onclick");
+}
+function escolha7j(cards) {
+    removePawnOnClick();
+    document.getElementById("drag7").setAttribute("draggable", "true");
+    document.getElementById("drag7").setAttribute("ondragstart", "drag(event, this)");
+    document.getElementById("drag7").setAttribute("onclick", "purpleSpecMov()");
+    document.getElementById("char7").style.opacity = "0.7";
+    document.getElementById("char7").removeAttribute("onclick");
+}
+function escolha8j(cards) {
+    removePawnOnClick();
+    document.getElementById("drag8").setAttribute("draggable", "true");
+    document.getElementById("drag8").setAttribute("ondragstart", "drag(event, this)");
+    document.getElementById("char8").style.opacity = "0.7";
+    document.getElementById("char8").removeAttribute("onclick");
+    let allSewers = document.getElementsByClassName("esgoto");
+    for (let i = 0; i < allSewers.length; i++) {
+        allSewers[i].setAttribute("draggable", "true");
+        allSewers[i].setAttribute("ondragstart", "drag(event, this)");
+    }
+}
+// ainda em duvidas porque coloco olhos e porque só assim funciona
+function drag(ev, olhos) {
+    ev.dataTransfer.setData("text", ev.target.id);
+    let estaDiv = parseInt(ev.path[1].id);
+    let perMovi = ev.path[0].id;
+
+    var gplrj = ["drag1", "drag2", "drag3", "drag4", "drag5", "drag6", "drag7", "drag8"];
+
+    if (gplrj.includes(perMovi)) {
+        addTheAllowDrop(estaDiv);
+    } else if (perMovi === "esgoto39" || perMovi === "esgoto122") {
+        var possibleSewerDroper = [20, 39, 57, 68, 95, 101, 122, 149];
+        for (i = 0; i < possibleSewerDroper.length; i++) {
+            let a = document.getElementById(possibleSewerDroper[i]);
+            a.setAttribute("ondrop", "drop(event, this)");
+            a.setAttribute("ondragover", "allowDrop(event, this)");
+        }
+    } else if (perMovi === "barreira23" || perMovi === "barreira146") {
+        var casaBarreira = [18, 23, 146, 143];
+        for (i = 0; i < casaBarreira.length; i++) {
+            let a = document.getElementById(casaBarreira[i]);
+            a.setAttribute("ondrop", "drop(event, this)");
+            a.setAttribute("ondragover", "allowDrop(event, this)");
+        }
+    } else {
+        var possibleLightDroper = [36, 42, 55, 69, 100, 114, 126, 133];
+        for (i = 0; i < possibleLightDroper.length; i++) {
+            let a = document.getElementById(possibleLightDroper[i]);
+            a.setAttribute("ondrop", "drop(event, this)");
+            a.setAttribute("ondragover", "allowDrop(event, this)");
+        }
+    }
+    //console.log("drag", estaDiv, ev.target, perMovi);
+}
+
+function addTheAllowDrop(startpoint) {
+    let a0 = startpoint - 9;
+    let b0 = startpoint - 8;
+    let c0 = startpoint - 16;
+    let a1 = startpoint + 7;
+    let d0 = startpoint - 7;
+    let b1 = startpoint + 8;
+    let c1 = startpoint + 16;
+    let d1 = startpoint + 9;
+
+    var destinos = [a0, b0, c0, d0, a1, b1, c1, d1];
+
+    var possibilidades = [];
+
+    destinos.forEach(function (item) {
+        possibilidades.push(item);
+    });
+    possibilidades.forEach(function (item) {
+        var cptds = document.getElementById(item);
+        cptds.setAttribute("ondrop", "drop(event, this)");
+        cptds.setAttribute("ondragover", "allowDrop(event, this)");
+    });
+}
+
+function allowDrop(ev, dedo) {
+    ev.preventDefault();
+    /**let x = document.getElementsByClassName("casa").id;
+    console.log("isto é a div", x); */
+}
+
+function drop(ev, nariz) {
+    ev.preventDefault();
+    var data = ev.dataTransfer.getData("text");
+    nariz.appendChild(document.getElementById(data));
+
+    let x = document.getElementById(nariz.id).children[0];
+    let sinal = x.id;
+    let whatitsClass = x.className;
+    var outrosItems = ["cande1", "cande2", "cande3", "cande4", "cande5", "cande6", "esgoto39", "esgoto122", "barreira23", "barreira146"];
+    if (outrosItems.includes(sinal) && specialMoveUsed === false) {
+        limpaSpecialMove(whatitsClass);
+        this.specialMoveUsed = true;
+    } else {
+        this.moves++;
+    }
+
+    if (sinal === "drag1" && moves > 2) {
+        sacaTestemunha();
+    } else if (sinal === "drag2" && moves > 2) {
+        let rdrg = document.getElementById("drag2");
+        rdrg.removeAttribute("draggable");
+        rdrg.removeAttribute("ondragstart");
+    } else if (sinal === "drag3" && moves > 2) {
+        let movAm = document.getElementById("drag3");
+        movAm.removeAttribute("draggable");
+        terminaMov();
+    } else if (sinal === "drag4" && moves > 2) {
+        let movAz = document.getElementById("drag3");
+        movAz.removeAttribute("draggable");
+        terminaMov();
+    } else if (sinal === "drag5" && moves > 3) {
+        terminaMov(); //<- spec move é decidido no drop
+    } else if (sinal === "drag6" && moves > 2) {
+        terminaMov();
+    } else if (sinal === "drag7") {
+        document.getElementById("drag7").removeAttribute("onclick");
+        this.specialMoveUsed = true;
+        if (this.moves === 3) {
+            terminaMov();
+        }
+    } else if (sinal === "drag8" && moves > 2) {
+        let movOrange = document.getElementById("drag8");
+        movOrange.removeAttribute("draggable");
+        movOrange.removeAttribute("ondragstart");
+        terminaMov();
+    }
+    if (moves > 0 && specialMoveUsed === true) {
+        document.getElementById("botFim").style.display = "block";
+    } else if (sinal === "drag2" && moves > 0) {
+        document.getElementById("drag2").setAttribute("onclick", "useLantern()");
+        //document.getElementById("setaimg").style.offsetX(ev.screenX);
+    //lant.style.top = (posDivX - 25) + "px";
+        console.log(sinal, nariz, x, ev, ev.screenX);
+    }
+    cleanDivs();
+}
+
+
+function cleanMoves() {
+    var y = document.getElementsByClassName("plr");
+    for (var i = 0; i < y.length; i++) {
+        y[i].removeAttribute("draggable");
+        y[i].removeAttribute("ondragstart");
+        y[i].removeAttribute("onclick");
+    }
+}
+function cleanDivs(){
+    var h = document.getElementsByClassName("casa");
+    for (var i = 0; i < h.length; i++) {
+        h[i].removeAttribute("ondrop");
+        h[i].removeAttribute("ondragover")
+    }
+}
+
+function removePawnOnClick() {
+    let pawnsWithClick = document.getElementsByClassName("plr");
+    for (let i = 0; i < pawnsWithClick.length; i++) {
+        pawnsWithClick[i].removeAttribute("onclick");
+    }
+}
+
+function terminaMov() {
+    this.specialMove = false;
+    this.allMovesSpend = false;
+    this.moves = 0;
+    cleanMoves();
+    document.getElementById("botFim").style.display = "none";
+
+    this.total++;
+    this.apagaCandeiro++;
+    if (total === 8) {
+        total = 0;
+        var rebotCards = document.getElementsByClassName("cards1")[0];
+        rebotCards.parentNode.removeChild(rebotCards);
+        var rebotCards2 = document.getElementsByClassName("cards2")[0];
+        rebotCards2.parentNode.removeChild(rebotCards2);
+        document.getElementById("restoCartas").hidden = false;
+
+        this.carregaRonda();
+        console.log("nova Ronda:", this.shuffleGameCards);
+    } else if (total === 4) {
+        document.getElementById("cards1").hidden = true;
+        document.getElementById("cards2").hidden = false;
+        document.getElementById("restoCartas").hidden = true;
+    }
+
+    if (total === 0 || total === 3 || total === 5 || total === 6) {
+        document.getElementById("crts").style.backgroundColor = "#e6e6e6e";
+        player1 = true;
+        player2 = false;
+    } else if (total === 1 || total === 2 || total === 4 || total === 7) {
+        document.getElementById("crts").style.backgroundColor = "#e4cd81";
+        player1 = false;
+        player2 = true;
+    }
+
+    switch (apagaCandeiro) {
+        case apagaCandeiro === 4:
+            document.getElementById("candeeiro1").hidden = true;
+            document.getElementById("relogio").setAttribute("src", "./assets/torre7.png");
+            break;
+        case apagaCandeiro === 8:
+            document.getElementById("candeeiro2").hidden = true;
+            document.getElementById("relogio").setAttribute("src", "./assets/torre6.png");
+            break;
+        case apagaCandeiro === 12:
+            document.getElementById("candeeiro3").hidden = true;
+            document.getElementById("relogio").setAttribute("src", "./assets/torre5.png");
+            break;
+        case apagaCandeiro === 16:
+            document.getElementById("candeeiro4").hidden = true;
+            document.getElementById("relogio").setAttribute("src", "./assets/torre4.png");
+            break;
+        case apagaCandeiro === 20:
+            document.getElementById("relogio").setAttribute("src", "./assets/torre3.png");
+            break;
+        case apagaCandeiro === 24:
+            document.getElementById("relogio").setAttribute("src", "./assets/torre2.png");
+            break;
+        case apagaCandeiro === 28:
+            document.getElementById("relogio").setAttribute("src", "./assets/torre1.png");
+            break;
+        case apagaCandeiro === 32:
+            endGameJackWIN(); //player2
+    }
+};
+
+//** Movimentos Especiais */
+/**vermelho */
+function sacaTestemunha(chrsShufle) {
+    var t = this.chrsShufle.pop();
+    let testExibit = document.createElement("IMG")
+    testExibit.setAttribute("class", "testemu");
+    testExibit.setAttribute("src", "./assets/Scan0" + t + ".png");
+    testExibit.setAttribute("height", "100px");
+
+    if (this.player1 === true) {
+        document.getElementsByClassName("playr1")[0].appendChild(testExibit);
+        var d = this.chrsShufle.pop();
+    } else if (this.player2 === true) {
+        document.getElementsByClassName("player2")[0].appendChild(testExibir);
+        var d = this.chrsShufle.pop();
+    }
+    document.getElementById("restoTestemunha").removeAttribute("onclick");
+    terminaMov();
+}
+/*castanho*/
+function useLantern() {    
+    rotacao += 60;
+    document.getElementById("setaimg").style.transform = "rotate("+ rotacao +"deg)";
+    document.getElementById("botFim").style.display = "block";
+}
+/**roxo */
+function purpleSpecMov() {
+    let otherPlayers = document.getElementsByClassName("plr");
+    for (let i = 0; i < otherPlayers.length; i++) {
+        otherPlayers[i].setAttribute("onclick", "bodyChange(this)");
+    }
+}
+function bodyChange(purp) {
+    let copiaId = purp.id;
+    let copiaSrc = purp.src;
+    var seca = copiaSrc.lastIndexOf("assets");
+    var fonte = copiaSrc.substr(seca);
+    var idSimplex = copiaId.substring(4);
+    document.getElementById("drag7").setAttribute("src", "./" + fonte);
+    document.getElementById(copiaId).setAttribute("src", "./assets/7.png");
+    document.getElementById("drag7").setAttribute("id", "drag");
+    document.getElementById(copiaId).setAttribute("id", "drag7");
+    document.getElementById("drag").setAttribute("id", "drag" + idSimplex);
+    terminaMov();
+}
+/*depois de usado tem de impedir de voltarem a ser utilizados*/
+function limpaSpecialMove(geral) {
+    var x = document.getElementsByClassName(geral);
+    console.log(geral);
+    for (i = 0; i < x.length; i++) {
+        x[i].removeAttribute("draggable");
+        x[i].removeAttribute("ondragstart");
+    }
+}
