@@ -19,15 +19,16 @@ var startBarreiras = [23, 146];
 
 var whoIsJack;
 var chrsShufle;
-
+var totalRounds = 0;
 var rotacao = 60;
 var moves = 0;
+var blackSpecial = 0;
 var specialMoveUsed = false;
 var allMovesSpend = false;
 var apagaCandeiro = 0;
 var player1 = true;
 var player2 = false;
-var bloqueioDeSeguranca = true;
+var securityBlock = true; //quando o preto é chamado ele fica true. bloqueio de segurança para outros ifs
 
 /** passo 1*/
 /** passo 1.1 criar tabuleiro */
@@ -160,7 +161,7 @@ function carregaRonda() {
     part2.setAttribute("class", "cards2");
     part2.setAttribute("id", "cards2");
     document.getElementsByClassName("cards")[0].appendChild(part2);
-    //document.getElementById("cards2").hidden = true;
+    document.getElementById("cards2").hidden = true;
 
     for (i = 0; i < 8; i++) {
         if (i < 4) {
@@ -221,7 +222,7 @@ function escolha1j(cards) {
     document.getElementById("drag1").setAttribute("ondragstart", "drag(event, this)");
     document.getElementById("char1").style.opacity = "0.7";
     document.getElementById("char1").removeAttribute("onclick");
-    document.getElementById("restoTestemunha").setAttribute("onclick", "recolheTestemunha()");
+    document.getElementById("restoTestemunha").setAttribute("onclick", "sacaTestemunha()");
 }
 function escolha2j(cards) {
     removePawnOnClick();
@@ -264,13 +265,12 @@ function escolha5j(cards) {
 }
 function escolha6j(cards) {
     removePawnOnClick();
+    this.securityBlock = false;
     let allChars = document.getElementsByClassName("plr");
     for (let i = 0; i < allChars.length; i++) {
         allChars[i].setAttribute("draggable", "true");
-        allChars[i].setAttribute("ondragstart", "dragothers(event, this)");
+        allChars[i].setAttribute("ondragstart", "drag(event, this)");
     }
-    document.getElementById("drag6").setAttribute("draggable", "true");
-    document.getElementById("drag6").setAttribute("ondragstart", "drag(event, this)");
     document.getElementById("char6").style.opacity = "0.7";
     document.getElementById("char6").removeAttribute("onclick");
 }
@@ -363,11 +363,11 @@ function drop(ev, nariz) {
     ev.preventDefault();
     var data = ev.dataTransfer.getData("text");
     nariz.appendChild(document.getElementById(data));
-
     let x = document.getElementById(nariz.id).children[0];
     let sinal = x.id;
     let whatitsClass = x.className;
     var outrosItems = ["cande1", "cande2", "cande3", "cande4", "cande5", "cande6", "esgoto39", "esgoto122", "barreira23", "barreira146"];
+
     if (outrosItems.includes(sinal) && specialMoveUsed === false) {
         limpaSpecialMove(whatitsClass);
         this.specialMoveUsed = true;
@@ -375,31 +375,39 @@ function drop(ev, nariz) {
         this.moves++;
     }
 
-    if (sinal === "drag1" && moves > 2) {
+    if (sinal === "drag1" && moves > 2 && this.securityBlock === true) {
         sacaTestemunha();
-    } else if (sinal === "drag2" && moves > 2) {
+        this.moves = 0;
+        this.allMove = false;
+    } else if (sinal === "drag2" && moves > 2 && this.securityBlock === true) {
         let rdrg = document.getElementById("drag2");
         rdrg.removeAttribute("draggable");
         rdrg.removeAttribute("ondragstart");
-    } else if (sinal === "drag3" && moves > 2) {
+    } else if (sinal === "drag3" && moves > 2 && this.securityBlock === true) {
         let movAm = document.getElementById("drag3");
         movAm.removeAttribute("draggable");
+        movAm.removeAttribute("ondragstart");
         terminaMov();
-    } else if (sinal === "drag4" && moves > 2) {
+    } else if (sinal === "drag4" && moves > 2 && this.securityBlock === true) {
         let movAz = document.getElementById("drag3");
         movAz.removeAttribute("draggable");
+        movAz.removeAttribute("ondragstart");
         terminaMov();
-    } else if (sinal === "drag5" && moves > 3) {
+    } else if (sinal === "drag5" && moves > 3 && this.securityBlock === true) {
+        //removeMsSpec();
         terminaMov(); //<- spec move é decidido no drop
+        this.moves = 0;
+        this.allMove = false;
     } else if (sinal === "drag6" && moves > 2) {
-        terminaMov();
+        document.getElementById("drag6").removeAttribute("draggable");
+        document.getElementById("drag6").removeAttribute("ondragstart");
     } else if (sinal === "drag7") {
         document.getElementById("drag7").removeAttribute("onclick");
         this.specialMoveUsed = true;
         if (this.moves === 3) {
             terminaMov();
         }
-    } else if (sinal === "drag8" && moves > 2) {
+    } else if (sinal === "drag8" && moves > 2 && this.securityBlock === true) {
         let movOrange = document.getElementById("drag8");
         movOrange.removeAttribute("draggable");
         movOrange.removeAttribute("ondragstart");
@@ -409,10 +417,30 @@ function drop(ev, nariz) {
         document.getElementById("botFim").style.display = "block";
     } else if (sinal === "drag2" && moves > 0) {
         document.getElementById("drag2").setAttribute("onclick", "useLantern()");
-        //document.getElementById("setaimg").style.offsetX(ev.screenX);
-    //lant.style.top = (posDivX - 25) + "px";
-        console.log(sinal, nariz, x, ev, ev.screenX);
+        let possitionXafter = document.getElementById(ev.target.id).offsetTop;
+        let possitionYafter = document.getElementById(ev.target.id).offsetLeft;
+        document.getElementById("setaimg").style.left = (possitionYafter + 15) + "px";
+        document.getElementById("setaimg").style.top = (possitionXafter - 25) + "px";
     }
+
+    if (this.securityBlock === false && sinal !== "drag6") {
+        this.moves--;
+        this.blackSpecial++;
+        if (this.blackSpecial >= 3) {
+            let ptSpl = document.getElementsByClassName("plr");
+            for (let i = 0; i < ptSpl.length; i++) {
+                ptSpl[i].removeAttribute("draggable");
+                ptSpl[i].removeAttribute("ondragstart");
+                let blackAternative = document.getElementById("drag6");
+                blackAternative.setAttribute("draggable", "true");
+                blackAternative.setAttribute("ondragstart", "drag(event, this)");
+            }
+            this.securityBlock = true;
+            this.specialMoveUsed = true;
+        }
+    }
+    console.log("other moves", blackSpecial);
+    console.log("moves", moves);
     cleanDivs();
 }
 
@@ -425,7 +453,7 @@ function cleanMoves() {
         y[i].removeAttribute("onclick");
     }
 }
-function cleanDivs(){
+function cleanDivs() {
     var h = document.getElementsByClassName("casa");
     for (var i = 0; i < h.length; i++) {
         h[i].removeAttribute("ondrop");
@@ -441,16 +469,16 @@ function removePawnOnClick() {
 }
 
 function terminaMov() {
-    this.specialMove = false;
+    this.specialMoveUsed = false;
     this.allMovesSpend = false;
     this.moves = 0;
     cleanMoves();
     document.getElementById("botFim").style.display = "none";
 
-    this.total++;
+    this.totalRounds++;
     this.apagaCandeiro++;
-    if (total === 8) {
-        total = 0;
+    if (totalRounds === 8) {
+        totalRounds = 0;
         var rebotCards = document.getElementsByClassName("cards1")[0];
         rebotCards.parentNode.removeChild(rebotCards);
         var rebotCards2 = document.getElementsByClassName("cards2")[0];
@@ -459,20 +487,22 @@ function terminaMov() {
 
         this.carregaRonda();
         console.log("nova Ronda:", this.shuffleGameCards);
-    } else if (total === 4) {
+    } else if (totalRounds === 4) {
         document.getElementById("cards1").hidden = true;
         document.getElementById("cards2").hidden = false;
         document.getElementById("restoCartas").hidden = true;
     }
 
-    if (total === 0 || total === 3 || total === 5 || total === 6) {
-        document.getElementById("crts").style.backgroundColor = "#e6e6e6e";
+    if (totalRounds === 0 || totalRounds === 3 || totalRounds === 5 || totalRounds === 6) {
+        document.getElementById("crts").style.backgroundColor = "#e6e6e6";
         player1 = true;
         player2 = false;
-    } else if (total === 1 || total === 2 || total === 4 || total === 7) {
+        console.log("cor prata");
+    } else if (totalRounds === 1 || totalRounds === 2 || totalRounds === 4 || totalRounds === 7) {
         document.getElementById("crts").style.backgroundColor = "#e4cd81";
         player1 = false;
         player2 = true;
+        console.log("cor oiro");
     }
 
     switch (apagaCandeiro) {
@@ -504,6 +534,7 @@ function terminaMov() {
         case apagaCandeiro === 32:
             endGameJackWIN(); //player2
     }
+    console.log("total rounds", totalRounds);
 };
 
 //** Movimentos Especiais */
@@ -519,16 +550,19 @@ function sacaTestemunha(chrsShufle) {
         document.getElementsByClassName("playr1")[0].appendChild(testExibit);
         var d = this.chrsShufle.pop();
     } else if (this.player2 === true) {
-        document.getElementsByClassName("player2")[0].appendChild(testExibir);
+        document.getElementsByClassName("playr2")[0].appendChild(testExibit);
         var d = this.chrsShufle.pop();
     }
     document.getElementById("restoTestemunha").removeAttribute("onclick");
     terminaMov();
 }
 /*castanho*/
-function useLantern() {    
+function useLantern() {
+    var brown = document.getElementById("drag2");
+    brown.removeAttribute("draggable");
+    brown.removeAttribute("ondragstart");
     rotacao += 60;
-    document.getElementById("setaimg").style.transform = "rotate("+ rotacao +"deg)";
+    document.getElementById("setaimg").style.transform = "rotate(" + rotacao + "deg)";
     document.getElementById("botFim").style.display = "block";
 }
 /**roxo */
@@ -559,4 +593,29 @@ function limpaSpecialMove(geral) {
         x[i].removeAttribute("draggable");
         x[i].removeAttribute("ondragstart");
     }
+}
+
+/** sistema de mensagens */
+function caixaDeMensagens() {
+    //coloquei varios tipos de variavies para treino
+    const inicio = "escolha a personagem";
+    const meio = "mova o peão";
+    const meioRed = "Pode continuar a mover ou tirar uma testemunha (max 3 movimentos)";
+    const meioBrown = "Pode continuar a mover ou rodar a lanterna (max 3 movimentos)";
+    const yellow = "pode arrastar um candeeiro ou mover-se (max 3 movimentos)";
+    const blue = "pode arastastar uma barreira ou mover-se (max 3 movimentos)";
+    const green = "pode mover-se (max 4 movimentos)";
+    const black = "pode mover-se ou chamar personagens";
+    const purple = "pode mover-se ou trocar de lugar ";
+    const orange = "pode arastastar um esgoto ou mover-se (max 3 movimentos)";
+    const final = "pressine Finaliza Mov";
+
+    const hint = ["Tirar testemunha termina movimento",
+        "Rodar lanterna termina movimento",
+        "apenas pode arrastar um candeeiro uma unica vez",
+        "Apenas pode arrastar uma barreira uma unica vez",
+        "Miss Stealth pode caminhar sobre casas mas tem de terminar nas ruas",
+        "Movendo outras personagens não usam habilidades",
+        "Não pode fazer as duas coisas",
+        "Apenas pode arrastar uma tampa de esgoto uma unica vez"];
 }
