@@ -1,0 +1,546 @@
+body {
+    background-image: url("assets/fundo.jpg");
+    background-size:     cover;
+    background-position: center center;
+  }
+  
+  /*barra auxiliar*/
+  .barrauxiliar{
+    position: fixed;
+    height: 50px;
+    width: 100%;
+    left: 0;
+    top: 0;
+    z-index: 99;
+    margin-bottom: 0.5em;
+    background: rgb(217, 217, 217, 50%);
+    text-align: center;
+  }
+  .rotateseta{
+    display: none;
+  }
+  
+  .botFim{
+    display: none;
+  }
+  /*fim barra auxiliar*/
+  
+  .tabuleiro{
+    margin-top: 3em;
+  }
+  
+  
+  /*tabuleiro e casas*/
+  div p {
+    margin: 0;
+    color: black;
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    margin-right: -50%;
+    transform: translate(-50%, -50%);
+  }
+  
+  img.bg {
+    position: absolute;
+    height: 517px;
+    width: 655px;
+    padding: 36px 40px;
+    margin: -24px -9px;
+    z-index: -3;
+    /*padding: 36px 40px;
+    margin: -21px -9px;*/
+  }
+  
+  /* imagem de rotação */
+  .lanterna {
+    position: absolute;
+    width: 6.3em;
+    height: 6.3em;
+    z-index: -2;
+    transform: rotate(-60deg);
+    /*outro modohh
+    rotate: -60deg;*/
+  }
+  
+  img.plr {
+    margin: 0;
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    margin-right: -50%;
+    transform: translate(-50%, -50%);
+  }
+  
+  img.barreira {
+    margin: 0;
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    margin-right: -50%;
+    transform: translate(-50%, -50%);
+  }
+  
+  img.esgoto {
+    margin: 0;
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    margin-right: -50%;
+    transform: translate(-50%, -50%);
+  }
+  
+  img.cande {
+    margin: 0;
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    margin-right: -50%;
+    transform: translate(-50%, -50%);
+  }
+  
+  div.casa {
+    width: 50px;
+    height: 50px;
+    background-color: rgb(128, 128, 128, 0.5);
+    display: inline-block;
+    margin: -14px 16.5px;
+    z-index: 15;
+    /**margin: -23.5px 16px;*/
+    -webkit-clip-path: polygon(25% 0, 75% 0, 100% 50%, 75% 100%, 25% 100%, 0 50%);
+    clip-path: url("#c1");
+  }
+  /**div {
+      width: 50px;
+    height: 50px;
+    background-color: gray;
+    display: inline-block;
+    margin: -23.5px 16px;
+    -webkit-clip-path: polygon(25% 0, 75% 0, 100% 50%, 75% 100%, 25% 100%, 0 50%);
+    clip-path: url("#c1");
+  }*/
+  
+  /**
+  div:nth-of-type(2), div:nth-of-type(3), div:nth-of-type(10)  {
+      background-color: green, 0.1;
+      } */
+  div:nth-of-type(9),
+  div:nth-of-type(18),
+  div:nth-of-type(25),
+  div:nth-of-type(23),
+  div:nth-of-type(143),
+  div:nth-of-type(146) {
+    background-color: rgb(0, 0, 139, 0.5);
+  }
+  
+  /**
+  div:nth-of-type(11), div:nth-of-type(12), div:nth-of-type(4), div:nth-of-type(19), div:nth-of-type(26), div:nth-of-type(35), div:nth-of-type(29), div:nth-of-type(21), div:nth-of-type(38), div:nth-of-type(30), div:nth-of-type(31), div:nth-of-type(40), div:nth-of-type(56), div:nth-of-type(72), div:nth-of-type(88), div:nth-of-type(104), div:nth-of-type(120), div:nth-of-type(127), div:nth-of-type(134), div:nth-of-type(142), div:nth-of-type(151), div:nth-of-type(150), div:nth-of-type(157), div:nth-of-type(156), div:nth-of-type(165), div:nth-of-type(148), div:nth-of-type(139), div:nth-of-type(131), div:nth-of-type(138), div:nth-of-type(137), div:nth-of-type(129), div:nth-of-type(113), div:nth-of-type(97), div:nth-of-type(81), div:nth-of-type(65), div:nth-of-type(49), div:nth-of-type(41), div:nth-of-type(25) {
+    background-color: brown, 0.1;
+  }*/
+  
+  div:nth-of-type(2),
+  div:nth-of-type(3),
+  div:nth-of-type(4),
+  div:nth-of-type(5),
+  div:nth-of-type(6),
+  div:nth-of-type(7),
+  div:nth-of-type(8),
+  div:nth-of-type(9),
+  div:nth-of-type(10),
+  div:nth-of-type(11),
+  div:nth-of-type(12),
+  div:nth-of-type(13),
+  div:nth-of-type(14),
+  div:nth-of-type(15),
+  div:nth-of-type(16),
+  div:nth-of-type(17),
+  div:nth-of-type(19),
+  div:nth-of-type(21),
+  div:nth-of-type(22),
+  div:nth-of-type(24),
+  div:nth-of-type(25),
+  div:nth-of-type(26),
+  div:nth-of-type(29),
+  div:nth-of-type(30),
+  div:nth-of-type(31),
+  div:nth-of-type(32),
+  div:nth-of-type(33),
+  div:nth-of-type(35),
+  div:nth-of-type(38),
+  div:nth-of-type(40),
+  div:nth-of-type(56),
+  div:nth-of-type(72),
+  div:nth-of-type(88),
+  div:nth-of-type(104),
+  div:nth-of-type(120),
+  div:nth-of-type(127),
+  div:nth-of-type(142),
+  div:nth-of-type(148),
+  div:nth-of-type(150),
+  div:nth-of-type(151),
+  div:nth-of-type(156),
+  div:nth-of-type(157),
+  div:nth-of-type(165),
+  div:nth-of-type(129),
+  div:nth-of-type(131),
+  div:nth-of-type(134),
+  div:nth-of-type(137),
+  div:nth-of-type(138),
+  div:nth-of-type(139),
+  div:nth-of-type(113),
+  div:nth-of-type(97),
+  div:nth-of-type(81),
+  div:nth-of-type(65),
+  div:nth-of-type(49),
+  div:nth-of-type(41),
+  div:nth-of-type(48),
+  div:nth-of-type(64),
+  div:nth-of-type(80),
+  div:nth-of-type(96),
+  div:nth-of-type(112),
+  div:nth-of-type(128),
+  div:nth-of-type(136),
+  div:nth-of-type(144),
+  div:nth-of-type(152),
+  div:nth-of-type(160),
+  div:nth-of-type(159),
+  div:nth-of-type(168),
+  div:nth-of-type(167),
+  div:nth-of-type(158),
+  div:nth-of-type(166),
+  div:nth-of-type(164),
+  div:nth-of-type(155),
+  div:nth-of-type(147),
+  div:nth-of-type(163),
+  div:nth-of-type(154),
+  div:nth-of-type(162),
+  div:nth-of-type(153),
+  div:nth-of-type(161),
+  div:nth-of-type(145) {
+    background-color: rgb(77, 26, 0, 0.2);
+  }
+  
+  div:nth-of-type(66),
+  div:nth-of-type(74),
+  div:nth-of-type(67),
+  div:nth-of-type(82),
+  div:nth-of-type(52),
+  div:nth-of-type(84),
+  div:nth-of-type(116),
+  div:nth-of-type(99),
+  div:nth-of-type(53),
+  div:nth-of-type(85),
+  div:nth-of-type(117),
+  div:nth-of-type(70),
+  div:nth-of-type(102),
+  div:nth-of-type(94),
+  div:nth-of-type(87),
+  div:nth-of-type(103) {
+    background-color:rgb(105, 47, 0, 0.2);
+  }
+  
+  div:nth-of-type(20),
+  div:nth-of-type(39),
+  div:nth-of-type(57),
+  div:nth-of-type(68),
+  div:nth-of-type(95),
+  div:nth-of-type(101),
+  div:nth-of-type(122),
+  div:nth-of-type(149) {
+    background-color: rgb(211, 211, 211, 0.5);
+  }
+  
+  div:nth-of-type(36),
+  div:nth-of-type(42),
+  div:nth-of-type(55),
+  div:nth-of-type(69),
+  div:nth-of-type(100),
+  div:nth-of-type(114),
+  div:nth-of-type(126),
+  div:nth-of-type(133) {
+    background-color: rgb(255, 255, 0, 0.2);
+  }
+  
+  div:nth-of-type(8n) ~ div {
+    -webkit-transform: translateX(41.5px);
+    transform: translateX(41.5px);
+  }
+  div:nth-of-type(16n) ~ div {
+    -webkit-transform: translateX(0.1px);
+    transform: translateX(0.1px);
+  }
+  div:nth-of-type(24n) ~ div {
+    -webkit-transform: translateX(41.5px);
+    transform: translateX(41.5px);
+  }
+  div:nth-of-type(32n) ~ div {
+    -webkit-transform: translateX(0.1px);
+    transform: translateX(0.1px);
+  }
+  div:nth-of-type(40n) ~ div {
+    -webkit-transform: translateX(41.5px);
+    transform: translateX(41.5px);
+  }
+  div:nth-of-type(48n) ~ div {
+    -webkit-transform: translateX(0.1px);
+    transform: translateX(0.1px);
+  }
+  div:nth-of-type(56n) ~ div {
+    -webkit-transform: translateX(41.5px);
+    transform: translateX(41.5px);
+  }
+  div:nth-of-type(64n) ~ div {
+    -webkit-transform: translateX(0.1px);
+    transform: translateX(0.1px);
+  }
+  div:nth-of-type(72n) ~ div {
+    -webkit-transform: translateX(41.5px);
+    transform: translateX(41.5px);
+  }
+  div:nth-of-type(80n) ~ div {
+    -webkit-transform: translateX(0.1px);
+    transform: translateX(0.1px);
+  }
+  div:nth-of-type(88n) ~ div {
+    -webkit-transform: translateX(41.5px);
+    transform: translateX(41.5px);
+  }
+  div:nth-of-type(96n) ~ div {
+    -webkit-transform: translateX(0.1px);
+    transform: translateX(0.1px);
+  }
+  div:nth-of-type(104n) ~ div {
+    -webkit-transform: translateX(41.5px);
+    transform: translateX(41.5px);
+  }
+  div:nth-of-type(112n) ~ div {
+    -webkit-transform: translateX(0.1px);
+    transform: translateX(0.1px);
+  }
+  div:nth-of-type(120n) ~ div {
+    -webkit-transform: translateX(41.5px);
+    transform: translateX(41.5px);
+  }
+  div:nth-of-type(128n) ~ div {
+    -webkit-transform: translateX(0.1px);
+    transform: translateX(0.1px);
+  }
+  div:nth-of-type(136n) ~ div {
+    -webkit-transform: translateX(41.5px);
+    transform: translateX(41.5px);
+  }
+  div:nth-of-type(144n) ~ div {
+    -webkit-transform: translateX(0.1px);
+    transform: translateX(0.1px);
+  }
+  div:nth-of-type(152n) ~ div {
+    -webkit-transform: translateX(41.5px);
+    transform: translateX(41.5px);
+  }
+  div:nth-of-type(160n) ~ div {
+    -webkit-transform: translateX(0.1px);
+    transform: translateX(0.1px);
+  }
+  section {
+    width: 700px;
+  }
+  
+  /******************************************termina as configurações iniciais *****************/
+  
+  /** configurações lado esquerdo **********************************************/
+  
+  button.inicia {
+    text-align: center;
+    display: block;
+  }
+  
+  button.hideJack {
+    display: block;
+  }
+  
+  .info {
+    margin-top: 3em;
+    position: relative;
+    float: right;
+    height: 100px;
+    width: 40%;
+    padding-bottom: 20px;
+  }
+  
+  img.jack {
+    float: left;
+    width: 75px;
+    margin-bottom: 25px;
+  }
+  
+  /** onde se ve se o jack esta ou não visivel */
+  img.visornot{
+    display: flex;
+    margin-left: 150px;
+    width: 75px;
+    height: 114.33px;
+    position: relative;
+    margin-bottom: 25px;  
+  }
+  
+  img.plChar {
+    width: 75px;
+    margin-right: 20px;
+    margin-left: 20px;
+  }
+  
+  div.cards {
+    padding: 10px;
+    width: 50%;
+  }
+  
+  /** fim do jogo/esgota tempo */
+  
+  @keyframes zoomnofimjogo {
+    0% {
+      transform: scale(0.1, 0.1);
+    } /**
+    50% {
+        transform: scale(0.5,0.5);
+    }*/
+    100% {
+      transform: scale(0.9, 0.9);
+    }
+  }
+  
+  .endGame {
+    -webkit-animation: zoomnofimjogo 5s forwards; /* Safari 4.0 - 8.0 */
+    animation: zoomnofimjogo 5s forwards;
+    position: absolute;
+    margin-top: -130px;
+    margin-left: -1000px;
+    max-width: 1100px;
+    max-height: 750px;
+  }
+  
+  .playr1 {
+    display: flex;
+  }
+  
+  .playr2 {
+    display: flex;
+  }
+  
+  
+  .jogadores{
+    display: -webkit-inline-box;
+    /*display: flex;*/
+  }
+  
+  
+  
+  /***************************modal **/
+  .ajuda{
+    position: fixed;
+     left: 0;
+     bottom: 0;
+     width: 100%;
+     color: white;
+     text-align: center;
+  }
+  
+  .modal {
+    display: none; /* Hidden by default */
+    position: fixed; /* Stay in place */
+    z-index: 1; /* Sit on top */
+    left: 0;
+    top: 0;
+    width: 100%; /* Full width */
+    height: 100%; /* Full height */
+    overflow: auto; /* Enable scroll if needed */
+    background-color: rgb(0,0,0); /* Fallback color */
+    background-color: rgba(0,0,0,0.4); /* Black w/ opacity */
+  }
+  
+  /* Modal Content/Box */
+  .modal-content {
+    /*background-color: #fefefe; */
+    margin: 1% auto; /* 15% from the top and centered */
+    padding: 10px;
+    /*border: 1px solid #fefefe;*/
+    width: 90%; /* Could be more or less, depending on screen size */
+    height: 90%;
+  }
+  
+  /* The Close Button */
+  .close {
+    color: white;
+    float: right;
+    font-size: 28px;
+    font-weight: bold;
+  }
+  
+  .close:hover,
+  .close:focus {
+    color: white;
+    text-decoration: none;
+    cursor: pointer;
+  }
+  
+  img.instru {
+    position: absolute;
+    width: 80%;
+  }
+  
+  /*** modal de mensagem para saber se o jack esta ou não com testemunhas *************************************/
+  .testConfrm {
+    display: none; /* Hidden by default */
+    position: fixed; /* Stay in place */
+    z-index: 1; /* Sit on top */
+    left: 0;
+    top: 0;
+    width: 100%; /* Full width */
+    height: 100%; /* Full height */
+    overflow: auto; /* Enable scroll if needed */
+    background-color: rgb(0,0,0); /* Fallback color */
+    background-color: rgba(0,0,0,0.4); /* Black w/ opacity */
+  }
+  
+  /* Modal Content/Box */
+  .testemunhaEscolha {
+    background-color: #fefefe, 0.2;
+    margin: 1% auto; /* 15% from the top and centered */
+    padding: 10px;
+    /*border: 1px solid #888;*/
+    width: 90%; /* Could be more or less, depending on screen size */
+    height: 90%;
+    text-align: center;
+    margin: 10px;
+  }
+  
+  /* The Close Button */
+  .close {
+    color: #aaa;
+    float: right;
+    /*font-size: 28px;*/
+    font-size: -webkit-xxx-large;
+    font-weight: bold;
+  }
+  
+  .close:hover,
+  .close:focus {
+    color: white;
+    text-decoration: none;
+    cursor: pointer;
+    font-size: -webkit-xxx-large;
+  }
+  
+  img.simesta {
+    display: flex; /* or inline-flex */
+    position: absolute;
+    margin: 20px;
+  }
+  img.naoesta {
+    display: flex; /* or inline-flex */
+    position: absolute;
+    margin: 20px;
+  }
+  
+  .restoTestemunha {
+    margin: 0 20px 0 20px;
+  }

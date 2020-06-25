@@ -1,0 +1,77 @@
+<!DOCTYPE HTML>
+<html>
+
+<head>
+    <link rel="shortcut icon" href="#" />
+    <meta charset="ISO-8859-1">
+    <link rel="stylesheet" type="text/css" href="reforgedStyles.css">
+    <script type="text/javascript" src="reforged.js"></script>
+</head>
+
+<body>
+    <div>
+        <div class="barrauxiliar" id="ba">
+            <button id="setabutt" class="rotateseta">Apontar Luz</button>
+            <button id="botFim" class="botFim" onclick="terminaMov(this)">Finaliza Mov</button>
+            <button class="howToPlay" id="howToPlay" onclick="tutoRial()">tutorial</button>
+            <button class="personas" id="personas" onclick="personas()">Personagens</button>
+        </div>
+        <section id="tabuleiro" class="tabuleiro" style="float: left;">
+            <img id="setaimg" class="lanterna" src="assets/seta.png">
+            <img id="bg" class="bg" src="assets/bg.png">
+        </section>
+        <div class="ajuda">
+            <!-- para o popup usarei o Modal -->
+            <div id="myModal" class="modal">
+                <!-- Modal content -->
+                <div class="modal-content">
+                    <span class="close" onclick="clsTur()">&times;</span>
+                    <img class="instru" id="instru" src="assets/tutorial.png">
+                </div>
+            </div>
+            <!-- para o popup usarei o Modal -->
+            <div id="myModal2" class="modal">
+                <!-- Modal content -->
+                <div class="modal-content">
+                    <span class="close" onclick="clsPrsn()">&times;</span>
+                    <img class="instru" id="instru" src="assets/personas.png">
+                </div>
+            </div>
+    
+            <!-- novo modal para ver se o jack esta testemunhado -->
+            <div id="testConfrm" class="testConfrm">
+            </div>
+    
+        </div>
+        <section class="info" style="float: right;">
+            <button class="inicia" onclick="iniciaJogo()">start</button>
+            <div class="cards" id="crts"></div>
+            <div class="restoDasCoisas" id="restoDasCoisas"></div>
+            <div class="jogadores">
+                <div class="p1" id="p1">
+                    <button class="hidePlay1" onclick="hidepla1()">Hide P1</button>
+                    <div class="playr1" id="playr1">
+                    </div>
+                </div>
+                <div class="p2" id="p2">
+                    <button class="hidePlay2" onclick="hidepla2()">Hide P2</button>
+                    <div class="playr2" id="playr2">
+                    </div>
+                </div>
+            </div>
+        </section>
+    </div>
+   
+    <svg height="0">
+        <clipPath id="c1">
+            <polygon points="10,0 40,0 50,25 40,50 10,50 0,25" fill="#fa5"></polygon>
+        </clipPath>
+        <!-- form https://bennettfeely.com/clippy/-->
+    </svg>
+
+     <!-- esta div tem de ser uma especie de footer com auxilio  -->
+    
+
+</body>
+
+</html>
