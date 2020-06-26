@@ -8,6 +8,7 @@ passo 5 -> fim do jogo
 window.onload = carregaJogo;
 //variaveis
 var autorizedHoles = [18, 20, 23, 25, 27, 28, 34, 37, 39, 43, 44, 45, 46, 47, 50, 51, 54, 57, 58, 59, 60, 61, 62, 63, 68, 71, 73, 75, 76, 77, 78, 79, 83, 86, 89, 90, 91, 92, 93, 95, 98, 101, 105, 106, 107, 108, 109, 110, 111, 115, 118, 119, 121, 122, 123, 124, 125, 130, 132, 135, 140, 141, 143, 146, 149, 151];
+var missStealthHoles = [35, 36, 41, 42, 52, 53, 55, 66, 67, 69, 70, 74, 82, 84, 85, 87, 94, 99, 100, 102, 103, 114, 116, 117, 126, 127, 131, 133, 134, 142];
 var startPawnPosition = [27, 60, 77, 79, 89, 91, 108, 141];
 var ordemEntradaPawn = [5, 1, 4, 2, 6, 8, 3, 7];
 var startCandeeiro = [42, 55, 69, 100, 114, 126];
@@ -16,7 +17,7 @@ var orderCande = [4, 1, 5, 6, 2, 3];
 var startTampaEsgoto = [39, 122];
 
 var startBarreiras = [23, 146];
-
+var sewerHoles = [20, 57, 68, 95, 101, 149]; //need be changed each time sewer is dropped
 var whoIsJack;
 var chrsShufle;
 var totalRounds = 0;
@@ -303,7 +304,7 @@ function drag(ev, olhos) {
     var gplrj = ["drag1", "drag2", "drag3", "drag4", "drag5", "drag6", "drag7", "drag8"];
 
     if (gplrj.includes(perMovi)) {
-        addTheAllowDrop(estaDiv);
+        addTheAllowDrop(estaDiv, olhos);
     } else if (perMovi === "esgoto39" || perMovi === "esgoto122") {
         var possibleSewerDroper = [20, 39, 57, 68, 95, 101, 122, 149];
         for (i = 0; i < possibleSewerDroper.length; i++) {
@@ -327,9 +328,10 @@ function drag(ev, olhos) {
         }
     }
     //console.log("drag", estaDiv, ev.target, perMovi);
+    console.log(sewerHoles);
 }
 
-function addTheAllowDrop(startpoint) {
+function addTheAllowDrop(startpoint, player) {
     let a0 = startpoint - 9;
     let b0 = startpoint - 8;
     let c0 = startpoint - 16;
@@ -339,19 +341,42 @@ function addTheAllowDrop(startpoint) {
     let c1 = startpoint + 16;
     let d1 = startpoint + 9;
 
-    var destinos = [a0, b0, c0, d0, a1, b1, c1, d1];
+    var destinyAllowed = [a0, b0, c0, d0, a1, b1, c1, d1];
 
     var possibilidades = [];
 
-    destinos.forEach(function (item) {
+    destinyAllowed.forEach(function (item) {
         possibilidades.push(item);
     });
-    possibilidades.forEach(function (item) {
-        var cptds = document.getElementById(item);
-        cptds.setAttribute("ondrop", "drop(event, this)");
-        cptds.setAttribute("ondragover", "allowDrop(event, this)");
-    });
-}
+
+    if (player.id === "drag5") {
+        possibilidades.forEach(function (item) {
+            var cptds = document.getElementById(item);
+            cptds.setAttribute("ondrop", "drop(event, this)");
+            cptds.setAttribute("ondragover", "allowDrop(event, this)");
+            console.log("isto é a miss Stealth");
+        });
+    } else if (sewerHoles.includes(startpoint)) {
+        let maxdrops = sewerHoles.concat(possibilidades);
+        maxdrops.forEach(function (item) {
+            if (autorizedHoles.includes(item)) {
+                var maxDrp = document.getElementById(item);
+                maxDrp.setAttribute("ondrop", "drop(event, this)");
+                maxDrp.setAttribute("ondragover", "allowDrop(event, this)");
+                console.log("aqui é um esgoto");
+            }
+        });
+    } else {
+        possibilidades.forEach(function (item) {
+            if (autorizedHoles.includes(item)) {
+                var cptds = document.getElementById(item);
+                cptds.setAttribute("ondrop", "drop(event, this)");
+                cptds.setAttribute("ondragover", "allowDrop(event, this)");
+                console.log("isto é uma casa normal");
+            }
+        });
+    }
+};
 
 function allowDrop(ev, dedo) {
     ev.preventDefault();
@@ -396,7 +421,6 @@ function drop(ev, nariz) {
     } else if (sinal === "drag5" && moves > 3 && this.securityBlock === true) {
         //removeMsSpec();
         terminaMov(); //<- spec move é decidido no drop
-        this.moves = 0;
         this.allMove = false;
     } else if (sinal === "drag6" && moves > 2) {
         document.getElementById("drag6").removeAttribute("draggable");
@@ -412,7 +436,28 @@ function drop(ev, nariz) {
         movOrange.removeAttribute("draggable");
         movOrange.removeAttribute("ondragstart");
         terminaMov();
+    } else if (whatitsClass === "esgoto") {
+        //refresh open sewers
+        var coveredHoles = [];
+        this.sewerHoles = [];
+        for (i = 0; i < 2; i++) {
+            let b = document.getElementsByClassName("esgoto")[i].parentNode.id;
+            var d = parseInt(b, 10);//no final coveredHoles aparecia como array de strings
+            coveredHoles.push(d);
+        }
+        var allSewer = [20, 39, 57, 68, 95, 101, 122, 149];
+        for (i = 0; i < allSewer.length; i++) {
+            //console.log(allSewer);
+            if (coveredHoles.includes(allSewer[i])) {
+                //console.log("inside", allSewer[i]);
+            } else {
+                sewerHoles.push(allSewer[i]);
+                //console.log("esgotos disponiveis", sewerHoles, "todos", allSewer, "tapados", coveredHoles);
+                //console.log("os buracos deviam ser:", sewerHoles);
+            }
+        }
     }
+
     if (moves > 0 && specialMoveUsed === true) {
         document.getElementById("botFim").style.display = "block";
     } else if (sinal === "drag2" && moves > 0) {
@@ -421,11 +466,21 @@ function drop(ev, nariz) {
         let possitionYafter = document.getElementById(ev.target.id).offsetLeft;
         document.getElementById("setaimg").style.left = (possitionYafter + 15) + "px";
         document.getElementById("setaimg").style.top = (possitionXafter - 25) + "px";
+    } else if (sinal === "drag5" && moves > 0) {
+        var f = parseInt(nariz.id, 10);
+        if (autorizedHoles.includes(f)) {
+            var i = document.getElementById("botFim");
+            i.style.display = "block";
+        } else {
+            var i = document.getElementById("botFim");
+            i.style.display = "none";
+        }
     }
 
     if (this.securityBlock === false && sinal !== "drag6") {
         this.moves--;
         this.blackSpecial++;
+        document.getElementById("botFim").style.display = "block";
         if (this.blackSpecial >= 3) {
             let ptSpl = document.getElementsByClassName("plr");
             for (let i = 0; i < ptSpl.length; i++) {
@@ -439,8 +494,6 @@ function drop(ev, nariz) {
             this.specialMoveUsed = true;
         }
     }
-    console.log("other moves", blackSpecial);
-    console.log("moves", moves);
     cleanDivs();
 }
 
@@ -469,9 +522,11 @@ function removePawnOnClick() {
 }
 
 function terminaMov() {
+    console.log("movimento terminado", moves);
+    this.moves = 0;
     this.specialMoveUsed = false;
     this.allMovesSpend = false;
-    this.moves = 0;
+    this.securityBlock = true;
     cleanMoves();
     document.getElementById("botFim").style.display = "none";
 
@@ -497,44 +552,51 @@ function terminaMov() {
         document.getElementById("crts").style.backgroundColor = "#e6e6e6";
         player1 = true;
         player2 = false;
-        console.log("cor prata");
     } else if (totalRounds === 1 || totalRounds === 2 || totalRounds === 4 || totalRounds === 7) {
         document.getElementById("crts").style.backgroundColor = "#e4cd81";
         player1 = false;
         player2 = true;
-        console.log("cor oiro");
     }
-
+    console.log("candeeiros não são apagados", apagaCandeiro);
     switch (apagaCandeiro) {
-        case apagaCandeiro === 4:
-            document.getElementById("candeeiro1").hidden = true;
+        case 4:
+            console.log("devia entrar aqui");
+            document.getElementById("cande1").hidden = true;
             document.getElementById("relogio").setAttribute("src", "./assets/torre7.png");
             break;
-        case apagaCandeiro === 8:
-            document.getElementById("candeeiro2").hidden = true;
+        case 8:
+            document.getElementById("cande2").hidden = true;
             document.getElementById("relogio").setAttribute("src", "./assets/torre6.png");
+            question();
             break;
-        case apagaCandeiro === 12:
-            document.getElementById("candeeiro3").hidden = true;
+        case 12:
+            document.getElementById("cande3").hidden = true;
             document.getElementById("relogio").setAttribute("src", "./assets/torre5.png");
+            question();
             break;
-        case apagaCandeiro === 16:
-            document.getElementById("candeeiro4").hidden = true;
+        case 16:
+            document.getElementById("cande4").hidden = true;
             document.getElementById("relogio").setAttribute("src", "./assets/torre4.png");
+            question();
             break;
-        case apagaCandeiro === 20:
+        case 20:
             document.getElementById("relogio").setAttribute("src", "./assets/torre3.png");
+            question();
             break;
-        case apagaCandeiro === 24:
+        case 24:
             document.getElementById("relogio").setAttribute("src", "./assets/torre2.png");
+            question();
             break;
-        case apagaCandeiro === 28:
+        case 28:
             document.getElementById("relogio").setAttribute("src", "./assets/torre1.png");
+            question();
             break;
-        case apagaCandeiro === 32:
+        case 32:
             endGameJackWIN(); //player2
     }
     console.log("total rounds", totalRounds);
+    console.log("movimento terminado", moves);
+    console.log("candeeiros", apagaCandeiro);
 };
 
 //** Movimentos Especiais */
@@ -585,14 +647,92 @@ function bodyChange(purp) {
     document.getElementById("drag").setAttribute("id", "drag" + idSimplex);
     terminaMov();
 }
+
 /*depois de usado tem de impedir de voltarem a ser utilizados*/
 function limpaSpecialMove(geral) {
     var x = document.getElementsByClassName(geral);
-    console.log(geral);
     for (i = 0; i < x.length; i++) {
         x[i].removeAttribute("draggable");
         x[i].removeAttribute("ondragstart");
     }
+}
+
+function hidepla1() {
+    var i = document.getElementsByClassName("playr1");
+    if (i[0].style.display === "none") {
+        i[0].style.display = "block";
+    } else {
+        i[0].style.display = "none";
+    }
+}
+function hidepla2() {
+    var i = document.getElementsByClassName("playr2");
+    if (i[0].style.display === "none") {
+        i[0].style.display = "block";
+    } else {
+        i[0].style.display = "none";
+    }
+}
+
+/**questiona se o jack esta visivel */
+function question() {
+    var cenas = document.getElementById("testConfrm");
+    cenas.style.display = "block";
+    let quest = document.createElement("div");
+    quest.setAttribute("class", "testemunhaEscolha");
+    quest.setAttribute("id", "testemunhaEscolha");
+
+    let pos = document.createElement("img");
+    pos.setAttribute("class", "jQuest");
+    pos.setAttribute("id", "simesta");
+    pos.setAttribute("src", "assets/test.png");
+    pos.setAttribute("onclick", "estaTestemunha()");
+    pos.setAttribute("height", "250px");
+
+    let pos2 = document.createElement("img");
+    pos2.setAttribute("class", "jQuest");
+    pos2.setAttribute("id", "naoesta");
+    pos2.setAttribute("src", "assets/notTest.png");
+    pos2.setAttribute("onclick", "naoEstaTestemunha()");
+    pos2.setAttribute("height", "250px");
+
+    quest.appendChild(pos);
+    quest.appendChild(pos2);
+    document.getElementById("testConfrm").appendChild(quest);
+}
+
+function estaTestemunha() {
+  document.getElementById("visornot").setAttribute("src", "assets/test.png");
+  var cenas = document.getElementById("testConfrm");
+  cenas.style.display = "none";
+  let apgesc= document.getElementById("testemunhaEscolha");
+  document.getElementById("testConfrm").removeChild(apgesc);
+  colocaClickPeoes();
+}
+
+function naoEstaTestemunha() {
+  document.getElementById("visornot").setAttribute("src", "assets/notTest.png");
+  var cenas = document.getElementById("testConfrm");
+  cenas.style.display = "none";
+  let apgesc= document.getElementById("testemunhaEscolha");
+  document.getElementById("testConfrm").removeChild(apgesc);
+  colocaClickPeoes()
+}
+
+/*permite clickar nos pões do campo quando se for respondido a testemunha*/
+function colocaClickPeoes() {
+  let poePeoesComClick = document.getElementsByClassName("plr");
+  for (let i = 0; i < poePeoesComClick.length; i++) {
+      poePeoesComClick[i].setAttribute("onclick", "cenas(this)");
+  }
+}
+
+/** retira o click adicionado acima */
+function retiraClickPeoes() {
+  let poePeoesComClick = document.getElementsByClassName("plr");
+  for (let i = 0; i < poePeoesComClick.length; i++) {
+      poePeoesComClick[i].removeAttribute("onclick");
+  }
 }
 
 /** sistema de mensagens */
@@ -619,3 +759,10 @@ function caixaDeMensagens() {
         "Não pode fazer as duas coisas",
         "Apenas pode arrastar uma tampa de esgoto uma unica vez"];
 }
+console.log(
+    "rever que todos os jogadores tem o terminar movimento",
+    "miss stealth nos esgotos",
+    "ainda tenho de programar as mensagens de alerta e ajuda",
+    "apagar candeeiros",
+    "jack testemundado"
+);
