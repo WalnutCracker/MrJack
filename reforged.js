@@ -17,6 +17,7 @@ var orderCande = [4, 1, 5, 6, 2, 3];
 var startTampaEsgoto = [39, 122];
 
 var startBarreiras = [23, 146];
+var escapeRoutes = [18, 23, 143, 146];
 var sewerHoles = [20, 57, 68, 95, 101, 149]; //need be changed each time sewer is dropped
 var whoIsJack;
 var chrsShufle;
@@ -99,6 +100,7 @@ function carregaJogo() {
 };
 /** passo 1.5 funções de inicio de jogo */
 function iniciaJogo() {
+    document.getElementById("warning").innerHTML = game[0];
     var chrs = [1, 2, 3, 4, 5, 6, 7, 8];
     chrsShufle = chrs.sort(function (a, b) { return 0.5 - Math.random() });
     whoIsJack = chrsShufle.pop();
@@ -224,6 +226,8 @@ function escolha1j(cards) {
     document.getElementById("char1").style.opacity = "0.7";
     document.getElementById("char1").removeAttribute("onclick");
     document.getElementById("restoTestemunha").setAttribute("onclick", "sacaTestemunha()");
+    this.specialMoveUsed = true;
+    document.getElementById("warning").innerHTML = game[1] + hint[0];
 }
 function escolha2j(cards) {
     removePawnOnClick();
@@ -231,6 +235,7 @@ function escolha2j(cards) {
     document.getElementById("drag2").setAttribute("ondragstart", "drag(event, this)");
     document.getElementById("char2").style.opacity = "0.7";
     document.getElementById("char2").removeAttribute("onclick");
+    document.getElementById("warning").innerHTML = game[1] + hint[1];
 }
 function escolha3j(cards) {
     removePawnOnClick();
@@ -244,6 +249,7 @@ function escolha3j(cards) {
         allLighters[i].setAttribute("draggable", "true");
         allLighters[i].setAttribute("ondragstart", "drag(event, this)");
     }
+    document.getElementById("warning").innerHTML = game[4] + hint[2];
 }
 function escolha4j(cards) {
     removePawnOnClick();
@@ -256,6 +262,7 @@ function escolha4j(cards) {
         allBlockates[i].setAttribute("draggable", "true");
         allBlockates[i].setAttribute("ondragstart", "drag(event, this)");
     }
+    document.getElementById("warning").innerHTML = game[5] + hint[3];
 }
 function escolha5j(cards) {
     removePawnOnClick();
@@ -263,6 +270,7 @@ function escolha5j(cards) {
     document.getElementById("drag5").setAttribute("ondragstart", "drag(event, this)");
     document.getElementById("char5").style.opacity = "0.7";
     document.getElementById("char5").removeAttribute("onclick");
+    document.getElementById("warning").innerHTML = game[6] + game[7];
 }
 function escolha6j(cards) {
     removePawnOnClick();
@@ -274,6 +282,7 @@ function escolha6j(cards) {
     }
     document.getElementById("char6").style.opacity = "0.7";
     document.getElementById("char6").removeAttribute("onclick");
+    document.getElementById("warning").innerHTML = game[8] + hint[4];
 }
 function escolha7j(cards) {
     removePawnOnClick();
@@ -282,6 +291,7 @@ function escolha7j(cards) {
     document.getElementById("drag7").setAttribute("onclick", "purpleSpecMov()");
     document.getElementById("char7").style.opacity = "0.7";
     document.getElementById("char7").removeAttribute("onclick");
+    document.getElementById("warning").innerHTML = game[9] + hint[5];
 }
 function escolha8j(cards) {
     removePawnOnClick();
@@ -294,12 +304,13 @@ function escolha8j(cards) {
         allSewers[i].setAttribute("draggable", "true");
         allSewers[i].setAttribute("ondragstart", "drag(event, this)");
     }
+    document.getElementById("warning").innerHTML = game[10] + hint[6];
 }
 // ainda em duvidas porque coloco olhos e porque só assim funciona
 function drag(ev, olhos) {
     ev.dataTransfer.setData("text", ev.target.id);
-    let estaDiv = parseInt(ev.path[1].id);
-    let perMovi = ev.path[0].id;
+    let estaDiv = parseInt(ev.composedPath()[1].id);
+    let perMovi = ev.composedPath()[0].id;
 
     var gplrj = ["drag1", "drag2", "drag3", "drag4", "drag5", "drag6", "drag7", "drag8"];
 
@@ -311,6 +322,7 @@ function drag(ev, olhos) {
             let a = document.getElementById(possibleSewerDroper[i]);
             a.setAttribute("ondrop", "drop(event, this)");
             a.setAttribute("ondragover", "allowDrop(event, this)");
+            //a.style.backgroundColor = '#51ff0060';
         }
     } else if (perMovi === "barreira23" || perMovi === "barreira146") {
         var casaBarreira = [18, 23, 146, 143];
@@ -318,6 +330,7 @@ function drag(ev, olhos) {
             let a = document.getElementById(casaBarreira[i]);
             a.setAttribute("ondrop", "drop(event, this)");
             a.setAttribute("ondragover", "allowDrop(event, this)");
+            //a.style.backgroundColor = '#51ff0060';
         }
     } else {
         var possibleLightDroper = [36, 42, 55, 69, 100, 114, 126, 133];
@@ -325,10 +338,11 @@ function drag(ev, olhos) {
             let a = document.getElementById(possibleLightDroper[i]);
             a.setAttribute("ondrop", "drop(event, this)");
             a.setAttribute("ondragover", "allowDrop(event, this)");
+            //a.style.backgroundColor = '#51ff0060';
         }
     }
     //console.log("drag", estaDiv, ev.target, perMovi);
-    console.log(sewerHoles);
+    //console.log(sewerHoles);
 }
 
 function addTheAllowDrop(startpoint, player) {
@@ -348,13 +362,21 @@ function addTheAllowDrop(startpoint, player) {
     destinyAllowed.forEach(function (item) {
         possibilidades.push(item);
     });
-
-    if (player.id === "drag5") {
+    if (sewerHoles.includes(startpoint) && player.id === "drag5") {
+        let maxdrops = sewerHoles.concat(possibilidades);
+        maxdrops.forEach(function (item) {
+            var maxDrp = document.getElementById(item);
+            maxDrp.setAttribute("ondrop", "drop(event, this)");
+            maxDrp.setAttribute("ondragover", "allowDrop(event, this)");
+            //maxDrp.style.backgroundColor = '#ebfb0480';
+        });
+    } else if (player.id === "drag5") {
         possibilidades.forEach(function (item) {
             var cptds = document.getElementById(item);
             cptds.setAttribute("ondrop", "drop(event, this)");
             cptds.setAttribute("ondragover", "allowDrop(event, this)");
-            console.log("isto é a miss Stealth");
+            //cptds.style.backgroundColor = '#ebfb0480';
+            //console.log("isto é a miss Stealth");
         });
     } else if (sewerHoles.includes(startpoint)) {
         let maxdrops = sewerHoles.concat(possibilidades);
@@ -363,7 +385,8 @@ function addTheAllowDrop(startpoint, player) {
                 var maxDrp = document.getElementById(item);
                 maxDrp.setAttribute("ondrop", "drop(event, this)");
                 maxDrp.setAttribute("ondragover", "allowDrop(event, this)");
-                console.log("aqui é um esgoto");
+                //maxDrp.style.backgroundColor = '#51ff0060';
+                //console.log("aqui é um esgoto");
             }
         });
     } else {
@@ -372,7 +395,8 @@ function addTheAllowDrop(startpoint, player) {
                 var cptds = document.getElementById(item);
                 cptds.setAttribute("ondrop", "drop(event, this)");
                 cptds.setAttribute("ondragover", "allowDrop(event, this)");
-                console.log("isto é uma casa normal");
+                //cptds.style.backgroundColor = '#ebfb0480';
+                //console.log("isto é uma casa normal");
             }
         });
     }
@@ -386,6 +410,7 @@ function allowDrop(ev, dedo) {
 
 function drop(ev, nariz) {
     ev.preventDefault();
+    var thiiisDiv2 = ev.target.id;
     var data = ev.dataTransfer.getData("text");
     nariz.appendChild(document.getElementById(data));
     let x = document.getElementById(nariz.id).children[0];
@@ -461,12 +486,14 @@ function drop(ev, nariz) {
     if (moves > 0 && specialMoveUsed === true) {
         document.getElementById("botFim").style.display = "block";
     } else if (sinal === "drag2" && moves > 0) {
+        document.getElementById("warning").innerHTML = game[3];
         document.getElementById("drag2").setAttribute("onclick", "useLantern()");
         let possitionXafter = document.getElementById(ev.target.id).offsetTop;
         let possitionYafter = document.getElementById(ev.target.id).offsetLeft;
         document.getElementById("setaimg").style.left = (possitionYafter + 15) + "px";
         document.getElementById("setaimg").style.top = (possitionXafter - 25) + "px";
     } else if (sinal === "drag5" && moves > 0) {
+        document.getElementById("warning").innerHTML = game[7];
         var f = parseInt(nariz.id, 10);
         if (autorizedHoles.includes(f)) {
             var i = document.getElementById("botFim");
@@ -494,6 +521,25 @@ function drop(ev, nariz) {
             this.specialMoveUsed = true;
         }
     }
+    //se dois peões estiverem na mesma casa JACUSE
+    //console.log(thiiisDiv2);
+    var ch = document.getElementById(thiiisDiv2)
+    var elementsInsideDiv = ch.childNodes.length;
+    if (elementsInsideDiv === 0) {
+        var jackverify = ch.id;
+        if (("drag" + whoIsJack) === jackverify) {
+            jackIsCatched();
+            console.log("jack is catched");
+        } else {
+            console.log("you missed");
+            jackEscaped();
+        }
+    }else if (thiiisDiv2.includes(escapeRoutes)) {
+        jackEscaped();
+    }
+    //console.log("last moved", ch.nextElementSibling);
+    //console.log("inside div early", ch);
+    //console.log("tem de ser 0",elementsInsideDiv);
     cleanDivs();
 }
 
@@ -511,6 +557,7 @@ function cleanDivs() {
     for (var i = 0; i < h.length; i++) {
         h[i].removeAttribute("ondrop");
         h[i].removeAttribute("ondragover")
+        //h[i].style.backgroundColor = '#8080801a';
     }
 }
 
@@ -592,11 +639,12 @@ function terminaMov() {
             question();
             break;
         case 32:
-            endGameJackWIN(); //player2
+            timeOverJackEscaped(); //player2
     }
-    console.log("total rounds", totalRounds);
-    console.log("movimento terminado", moves);
-    console.log("candeeiros", apagaCandeiro);
+    //console.log("total rounds", totalRounds);
+    //console.log("movimento terminado", moves);
+    //console.log("candeeiros", apagaCandeiro);
+    document.getElementById("warning").innerHTML = game[12];
 };
 
 //** Movimentos Especiais */
@@ -702,67 +750,82 @@ function question() {
 }
 
 function estaTestemunha() {
-  document.getElementById("visornot").setAttribute("src", "assets/test.png");
-  var cenas = document.getElementById("testConfrm");
-  cenas.style.display = "none";
-  let apgesc= document.getElementById("testemunhaEscolha");
-  document.getElementById("testConfrm").removeChild(apgesc);
-  colocaClickPeoes();
+    document.getElementById("visornot").setAttribute("src", "assets/test.png");
+    var cenas = document.getElementById("testConfrm");
+    cenas.style.display = "none";
+    let apgesc = document.getElementById("testemunhaEscolha");
+    document.getElementById("testConfrm").removeChild(apgesc);
+    colocaClickPeoes();
 }
 
 function naoEstaTestemunha() {
-  document.getElementById("visornot").setAttribute("src", "assets/notTest.png");
-  var cenas = document.getElementById("testConfrm");
-  cenas.style.display = "none";
-  let apgesc= document.getElementById("testemunhaEscolha");
-  document.getElementById("testConfrm").removeChild(apgesc);
-  colocaClickPeoes()
+    document.getElementById("visornot").setAttribute("src", "assets/notTest.png");
+    var cenas = document.getElementById("testConfrm");
+    cenas.style.display = "none";
+    let apgesc = document.getElementById("testemunhaEscolha");
+    document.getElementById("testConfrm").removeChild(apgesc);
+    colocaClickPeoes()
 }
 
 /*permite clickar nos pões do campo quando se for respondido a testemunha*/
 function colocaClickPeoes() {
-  let poePeoesComClick = document.getElementsByClassName("plr");
-  for (let i = 0; i < poePeoesComClick.length; i++) {
-      poePeoesComClick[i].setAttribute("onclick", "cenas(this)");
-  }
+    let poePeoesComClick = document.getElementsByClassName("plr");
+    for (let i = 0; i < poePeoesComClick.length; i++) {
+        poePeoesComClick[i].setAttribute("onclick", "cenas(this)");
+    }
 }
 
 /** retira o click adicionado acima */
 function retiraClickPeoes() {
-  let poePeoesComClick = document.getElementsByClassName("plr");
-  for (let i = 0; i < poePeoesComClick.length; i++) {
-      poePeoesComClick[i].removeAttribute("onclick");
-  }
+    let poePeoesComClick = document.getElementsByClassName("plr");
+    for (let i = 0; i < poePeoesComClick.length; i++) {
+        poePeoesComClick[i].removeAttribute("onclick");
+    }
 }
 
+function cenas(att) {
+    console.log(att.id);
+    var attId = att.id;
+    var idp = attId.substring(4);
+    document.getElementById(att.id).setAttribute("src", "./assets/" + idp + "ds.png");
+}
+
+function jackIsCatched(){
+    alert("Congrats you catch Jack the Ripper");
+}
+
+function jackEscaped() {
+    alert("Ho no. You didn't catch jack and he run away")
+}
+
+function timeOverJackEscaped() {
+    alert ("Time Runs out, the daylight arrive the people got out from his homes and jack escaped");
+}
 /** sistema de mensagens */
-function caixaDeMensagens() {
-    //coloquei varios tipos de variavies para treino
-    const inicio = "escolha a personagem";
-    const meio = "mova o peão";
-    const meioRed = "Pode continuar a mover ou tirar uma testemunha (max 3 movimentos)";
-    const meioBrown = "Pode continuar a mover ou rodar a lanterna (max 3 movimentos)";
-    const yellow = "pode arrastar um candeeiro ou mover-se (max 3 movimentos)";
-    const blue = "pode arastastar uma barreira ou mover-se (max 3 movimentos)";
-    const green = "pode mover-se (max 4 movimentos)";
-    const black = "pode mover-se ou chamar personagens";
-    const purple = "pode mover-se ou trocar de lugar ";
-    const orange = "pode arastastar um esgoto ou mover-se (max 3 movimentos)";
-    const final = "pressine Finaliza Mov";
-
-    const hint = ["Tirar testemunha termina movimento",
-        "Rodar lanterna termina movimento",
-        "apenas pode arrastar um candeeiro uma unica vez",
-        "Apenas pode arrastar uma barreira uma unica vez",
-        "Miss Stealth pode caminhar sobre casas mas tem de terminar nas ruas",
-        "Movendo outras personagens não usam habilidades",
-        "Não pode fazer as duas coisas",
-        "Apenas pode arrastar uma tampa de esgoto uma unica vez"];
-}
+const game = [
+    "escolha a personagem",
+    "mova o peao <br>",
+    "Pode continuar a mover ou tirar uma testemunha (max 3 movimentos)<br>",
+    "Pode continuar a mover ou rodar a lanterna (max 3 movimentos)<br>",
+    "pode arrastar um candeeiro ou mover-se (max 3 movimentos)<br>",
+    "pode arastastar uma barreira ou mover-se (max 3 movimentos)<br>",
+    "Miss Stealth pode mover-se (max 4 movimentos)<br>",
+    "Miss Stealth pode caminhar sobre casas mas tem de terminar nas ruas",
+    "pode mover-se ou chamar personagens<br>",
+    "pode mover-se ou trocar de lugar <br>",
+    "pode arastastar um esgoto ou mover-se (max 3 movimentos)<br>",
+    "pressine Finaliza Mov",
+    "movimento terminado, escolha outra personagem"
+];
+const hint = ["Tirar testemunha termina movimento",
+    "Rodar lanterna termina movimento",
+    "apenas pode arrastar um candeeiro uma unica vez",
+    "Apenas pode arrastar uma barreira uma unica vez",
+    "Movendo outras personagens não usam habilidades",
+    "Não pode fazer as duas coisas",
+    "Apenas pode arrastar uma tampa de esgoto uma unica vez"
+];
 console.log(
-    "rever que todos os jogadores tem o terminar movimento",
-    "miss stealth nos esgotos",
-    "ainda tenho de programar as mensagens de alerta e ajuda",
-    "apagar candeeiros",
-    "jack testemundado"
+    "rever que todos os jogadores tem o terminar movimento <br>",
+
 );

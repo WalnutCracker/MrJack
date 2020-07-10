@@ -11,11 +11,12 @@
 <body>
     <div>
         <div class="barrauxiliar" id="ba">
+            <button id="novaRonda" class="novaronda" onclick="retiraClickPeoes()">novaronda</button>
             <button id="botFim" class="botFim" onclick="terminaMov(this)">Finaliza Mov</button>
             <button class="howToPlay" id="howToPlay" onclick="tutoRial()">tutorial</button>
             <button class="personas" id="personas" onclick="personas()">Personagens</button>
             <div class="msgBox" id="msgBox">
-                <p id="warning">Bacon ipsum dolor amet beef corned beef tail biltong pork loin tenderloin ground round cow t-bone.</p>
+                <p id="warning">Pressioe Start Para iniciar</p>
             </div>
         </div>
         
@@ -73,7 +74,29 @@
     </svg>
 
      <!-- esta div tem de ser uma especie de footer com auxilio  -->
-    
+     <div class="ajuda">
+        <!-- para o popup usarei o Modal -->
+        <div id="myModal" class="modal">
+            <!-- Modal content -->
+            <div class="modal-content">
+                <span class="close" onclick="clsTur()">&times;</span>
+                <img class="instru" id="instru" src="assets/tutorial.png">
+            </div>
+        </div>
+        <!-- para o popup usarei o Modal -->
+        <div id="myModal2" class="modal">
+            <!-- Modal content -->
+            <div class="modal-content">
+                <span class="close" onclick="clsPrsn()">&times;</span>
+                <img class="instru" id="instru" src="assets/personas.png">
+            </div>
+        </div>
+
+        <!-- novo modal para ver se o jack esta testemunhado -->
+        <div id="testConfrm" class="testConfrm">
+        </div>
+
+    </div>
 
 </body>
 
